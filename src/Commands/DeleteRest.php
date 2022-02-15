@@ -42,7 +42,7 @@ class DeleteRest extends Command
      *
      * @var string
      */
-    protected $signature = 'rest:delete {model} {--F|force} {--D|withDirectory}';
+    protected $signature = 'rest:delete {model} {--F|force}';
 
     public function handle()
     {
@@ -52,19 +52,17 @@ class DeleteRest extends Command
 
         // get all options
         $force = $this->option('force');
-        $deleteDirectory = $this->option('withDirectory');
 
-//        // check model exists
-//        $models = $this->getAllModels();
-//        if (!in_array($this->model, $models)){
-//            $this->warn("There is no Model with");
-//            return;
-//        }
+        // check model exists
+        $models = $this->getAllModels();
+        if (!in_array($this->model, $models)){
+            $this->warn("There is no Model with");
+            return;
+        }
 
         // handle confirm
-        $deleteDirectory
-            ? $question = "Do you want to delete rest {$this->model} (Model, Controller, Request, Resource) with it's whole directory ?!!"
-            : $question = "Do you want to delete rest {$this->model} (Model, Controller, Request, Resource) ?!";
+        $question = "Do you want to delete rest {$this->model} (Model, Controller, Request, Resource) ?!";
+
         if ($force) $delete = true;
         elseif ($this->confirm($question)) $delete = true;
         else $delete = false;
@@ -72,8 +70,6 @@ class DeleteRest extends Command
         if ($delete) {
             $allFiles = $this->getAllFiles();
             $this->deleteAllFiles($allFiles);
-
-            if ($deleteDirectory) $this->deleteAllFolders($allFiles);
 
             $this->composer->dumpOptimized();
         }
@@ -87,23 +83,18 @@ class DeleteRest extends Command
         return [
             [
                 'path' => app_path() . "\\Http\\Request\\{$this->modelFull}" . DIRECTORY_SEPARATOR . "StoreRequest.php",
-                'has_folder' => true,
             ],
             [
                 'path' => app_path() . "\\Http\\Request\\{$this->modelFull}" . DIRECTORY_SEPARATOR . "UpdateRequest.php",
-                'has_folder' => true
             ],
             [
                 'path' => app_path() . "\\Http\\Resource\\{$this->modelFull}" . DIRECTORY_SEPARATOR . "{$this->model}Resource.php",
-                'has_folder' => true
             ],
             [
                 'path' => app_path() . "\\Http\\Controllers\\{$this->modelFull}" . DIRECTORY_SEPARATOR . "{$this->model}Controller.php",
-                'has_folder' => true
             ],
             [
                 'path' => app_path() . "\\Models" . DIRECTORY_SEPARATOR . "{$this->model}.php",
-                'has_folder' => false
             ],
         ];
     }
@@ -118,25 +109,6 @@ class DeleteRest extends Command
             $path = $file['path'];
             File::delete($path);
             $this->info("Removes $path");
-        }
-    }
-
-    /**
-     * @param array $allFiles
-     * @return void
-     */
-    public function deleteAllFolders(array $allFiles): void
-    {
-        foreach ($allFiles as $file) {
-            if ($file['has_folder']) {
-                $path = $file['path'];
-                $folder = str_replace(array_reverse(explode("\\", $path))[0], "", $path);
-
-                if (File::exists($folder))
-                    File::deleteDirectory($folder);
-
-                $this->info("Removes $folder");
-            }
         }
     }
 
