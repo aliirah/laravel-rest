@@ -1,0 +1,84 @@
+<?php
+
+namespace {{ namespace }};
+
+use Alirah\LaravelRest\Rest;
+use App\Http\Controllers\Controller;
+use App\Http\Request\{{ modelFull }}\StoreRequest;
+use App\Http\Request\{{ modelFull }}\UpdateRequest;
+use Illuminate\Http\JsonResponse;
+use App\Models\{{ model }};
+use App\Http\Resource\{{ modelFull }}\{{ model }}Resource;
+
+class {{ model }}Controller extends Controller
+{
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return JsonResponse
+     */
+    public function index(): JsonResponse
+    {
+        ${{ modelLower }}s = {{ model }}::get();
+        // TODO handle query
+        return Rest::ok({{ model }}Resource::collection(${{ modelLower }}s));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param StoreRequest $request
+     * @return JsonResponse
+     */
+    public function store(StoreRequest $request): JsonResponse
+    {
+        $item = {{ model }}::create($request->validated());
+
+        return Rest::accepted(new {{ model }}Resource($item));
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param {{ model }} ${{ modelLower }}
+     * @return JsonResponse
+     */
+    public function show({{ model }} ${{ modelLower }}): JsonResponse
+    {
+        // you can load relationships by using
+        // ${{ modelLower }}->load('relation-1', 'relation-2');
+
+        return Rest::ok(new {{ model }}Resource(${{ modelLower }}));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param UpdateRequest $request
+     * @param {{ model }} ${{ modelLower }}
+     * @return JsonResponse
+     */
+    public function update(UpdateRequest $request, {{ model }} ${{ modelLower }}): JsonResponse
+    {
+        // TODO handle updated fields
+        ${{ modelLower }}->update($request->only(''));
+
+        return Rest::accepted(new {{ model }}Resource(${{ modelLower }}));
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param {{ model }} ${{ modelLower }}
+     * @return JsonResponse
+     */
+    public function destroy({{ model }} ${{ modelLower }}): JsonResponse
+    {
+        ${{ modelLower }}->delete();
+
+        return Rest::accepted([
+            'message' => '{{ modelLower }} deleted successfully'
+        ]);
+    }
+}

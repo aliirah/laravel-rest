@@ -1,0 +1,32 @@
+{
+    "name": "alirah/laravel-rest",
+    "description": "this package used for making api controller much easier.",
+    "type": "library",
+    "require": {
+        "php": ">=7.3|>=8.0",
+        "illuminate/support": ">=8.0.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Alirah\\LaravelRest\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "\\Alirah\\LaravelRest\\LaravelRestServiceProvider"
+            ],
+            "aliases": {
+                "Rest": "Alirah\\LaravelRest\\Rest"
+            }
+        }
+    },
+    "authors": [
+        {
+            "name": "alirah",
+            "email": "alirahgoshy@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
