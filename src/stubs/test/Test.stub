@@ -20,21 +20,21 @@ class {{ model }}Test extends TestCase
 
     public function test_index()
     {
-        $response = $this->json('get', '/api/{{ modelLower }}');
+        $response = $this->json('get', '/api/{{ modelLower }}s');
 
         $response->assertStatus(Response::HTTP_OK);
     }
 
     public function test_show()
     {
-        $response = $this->json('get', '/api/{{ modelLower }}/1');
+        $response = $this->json('get', '/api/{{ modelLower }}s/1');
 
         $response->assertStatus(Response::HTTP_OK);
     }
 
     public function test_update()
     {
-        $response = $this->json('put', '/api/{{ modelLower }}/1', [
+        $response = $this->json('put', '/api/{{ modelLower }}s/1', [
             // TODO custom fields
         ]);
 
@@ -43,7 +43,7 @@ class {{ model }}Test extends TestCase
 
 //    public function test_delete()
 //    {
-//        $response = $this->json('delete', '/api/{{ modelLower }}/1');
+//        $response = $this->json('delete', '/api/{{ modelLower }}s/1');
 //
 //        $response->assertStatus(Response::HTTP_ACCEPTED);
 //    }
