@@ -4,8 +4,8 @@ namespace Alirah\LaravelRest\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Input\InputArgument;
 
 class CreateRest extends Command
 {
@@ -29,6 +29,7 @@ class CreateRest extends Command
     public string $modelFull;
     public string $namespace;
     public string $tableName;
+    public bool $force;
 
     public function __construct()
     {
@@ -51,7 +52,10 @@ class CreateRest extends Command
         $this->modelLower = lcfirst($this->model);
         $this->tableName = '';
 
-        $this->createRequests();
+        $this->force = $this->option('full');
+
+        $this->createStoreRequests();
+        $this->createUpdateRequests();
         $this->createResource();
         $this->createController();
 
@@ -104,14 +108,34 @@ class CreateRest extends Command
     /**
      * @return void
      */
-    public function createRequests(): void
+    public function createStoreRequests(): void
     {
         $this->namespace = "App\\Http\\Request\\" . $this->modelFull;
         $storeRequestTemplate = $this->getTemplate('/stubs/request/StoreRequest.stub');
-        $this->createFile($this->namespace, "StoreRequest.php", $storeRequestTemplate);
 
+        $existsPath = app_path() . "\\Http\\Request\\{$this->modelFull}\\StoreRequest.php";
+        if (!$this->force && File::exists($existsPath)) {
+            $this->warn("{$this->modelFull}\\StoreRequest already exists.");
+            if (!$this->confirm('Do you want to override StoreRequest?')) return;
+        }
+
+        $this->createFile($this->namespace, "StoreRequest.php", $storeRequestTemplate);
+    }
+
+    /**
+     * @return void
+     */
+    public function createUpdateRequests(): void
+    {
         $this->namespace = "App\\Http\\Request\\" . $this->modelFull;
         $updateRequestTemplate = $this->getTemplate('/stubs/request/UpdateRequest.stub');
+
+        $existsPath = app_path() . "\\Http\\Request\\{$this->modelFull}\\UpdateRequest.php";
+        if (!$this->force && File::exists($existsPath)) {
+            $this->warn("{$this->modelFull}\\UpdateRequest already exists.");
+            if (!$this->confirm('Do you want to override UpdateRequest?')) return;
+        }
+
         $this->createFile($this->namespace, "UpdateRequest.php", $updateRequestTemplate);
         $this->info('StoreRequest & UpdateRequest created');
     }
@@ -123,6 +147,13 @@ class CreateRest extends Command
     {
         $this->namespace = "App\\Http\\Resource\\" . $this->modelFull;
         $resource = $this->getTemplate('/stubs/resource/Resource.stub');
+
+        $existsPath = app_path() . "\\Http\\Resource\\{$this->model}\\{$this->modelFull}Resource.php";
+        if (!$this->force && File::exists($existsPath)) {
+            $this->warn("{$this->modelFull}Resource already exists.");
+            if (!$this->confirm('Do you want to override resource?')) return;
+        }
+
         $this->createFile($this->namespace, "{$this->model}Resource.php", $resource);
         $this->info("{$this->model}Resource created");
     }
@@ -134,6 +165,13 @@ class CreateRest extends Command
     {
         $this->namespace = "App\\Http\\Controllers\\" . $this->modelFull;
         $controller = $this->getTemplate('/stubs/controller/Controller.stub');
+
+        $existsPath = app_path() . "\\Http\\Controllers\\{$this->model}\\{$this->modelFull}Controller.php";
+        if (!$this->force && File::exists($existsPath)) {
+            $this->warn("{$this->modelFull}Controller already exists.");
+            if (!$this->confirm('Do you want to override controller?')) return;
+        }
+
         $this->createFile($this->namespace, "{$this->model}Controller.php", $controller);
         $this->info("{$this->model}Controller created");
     }
@@ -147,8 +185,8 @@ class CreateRest extends Command
         $fullName = date('Y_m_d_His', time()) . "_create_{$this->tableName}_table";
         $this->namespace = '/migrations/';
 
-        if (DB::table($this->tableName)) {
-            $this->warn("Table with {$this->tableName} already exists.");
+        if (!$this->force && DB::table($this->tableName)) {
+            $this->warn("Table {$this->tableName} already exists.");
             if (!$this->confirm('Do you want to create migration anyway?')) return;
         }
 
@@ -164,8 +202,15 @@ class CreateRest extends Command
     {
         $this->namespace = "App\\Models";
         $model = $this->getTemplate('/stubs/model/Model.stub');
+
+        $existsPath = app_path() . "\\Models\\$this->model.php";
+        if (!$this->force && File::exists($existsPath)) {
+            $this->warn("model {$this->model} already exists.");
+            if (!$this->confirm('Do you want to override model?')) return;
+        }
+
         $this->createFile($this->namespace, "{$this->model}.php", $model);
-        $this->info("{$this->model} created");
+        $this->info("{$this->model} Model created");
     }
 
     public function camelCase2UnderScore($str, $separator = "_"): string

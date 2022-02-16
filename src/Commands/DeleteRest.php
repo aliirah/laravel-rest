@@ -29,6 +29,7 @@ class DeleteRest extends Command
     public string $modelLower;
     public string $modelFull;
     public array $models;
+    public string|array|bool|null $force;
 
     public function __construct()
     {
@@ -51,28 +52,12 @@ class DeleteRest extends Command
         $this->modelLower = lcfirst($this->model);
 
         // get all options
-        $force = $this->option('force');
+        $this->force = $this->option('force');
 
-        // check model exists
-        $models = $this->getAllModels();
-        if (!in_array($this->model, $models)){
-            $this->warn("There is no Model with");
-            return;
-        }
+        $allFiles = $this->getAllFiles();
+        $this->deleteAllFiles($allFiles);
 
-        // handle confirm
-        $question = "Do you want to delete rest {$this->model} (Model, Controller, Request, Resource) ?!";
-
-        if ($force) $delete = true;
-        elseif ($this->confirm($question)) $delete = true;
-        else $delete = false;
-
-        if ($delete) {
-            $allFiles = $this->getAllFiles();
-            $this->deleteAllFiles($allFiles);
-
-            $this->composer->dumpOptimized();
-        }
+        $this->composer->dumpOptimized();
     }
 
     /**
@@ -107,23 +92,15 @@ class DeleteRest extends Command
     {
         foreach ($allFiles as $file) {
             $path = $file['path'];
-            File::delete($path);
-            $this->info("Removes $path");
+            if (File::exists($path)) {
+                if ($this->force) {
+                    File::delete($path);
+                    $this->info("Removes $path");
+                } else if ($this->confirm("Do you want to delete $path")) {
+                    File::delete($path);
+                    $this->info("Removes $path");
+                };
+            }
         }
-    }
-
-    /**
-     * @return array
-     */
-    public function getAllModels(): array
-    {
-        $models = [];
-        $modelsPath = app_path('Models');
-        $modelFiles = File::allFiles($modelsPath);
-        foreach ($modelFiles as $modelFile) {
-            $models[] = $modelFile->getFilenameWithoutExtension();
-        }
-
-        return $models;
     }
 }
