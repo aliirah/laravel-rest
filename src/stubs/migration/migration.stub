@@ -13,11 +13,13 @@
       */
      public function up()
      {
-         Schema::create('{{ tableName }}', function (Blueprint $table) {
-             $table->id();
-             // TODO table fields
-             $table->timestamps();
-         });
+          if (!Schema::hasTable('{{ tableName }}')) {
+             Schema::create('{{ tableName }}', function (Blueprint $table) {
+                 $table->id();
+                 // TODO table fields
+                 $table->timestamps();
+             });
+          }
      }
 
      /**
