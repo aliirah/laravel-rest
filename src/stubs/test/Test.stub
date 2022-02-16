@@ -1,0 +1,50 @@
+<?php
+
+namespace Tests\Feature\{{ model }};
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Symfony\Component\HttpFoundation\Response;
+use Tests\TestCase;
+
+class {{ model }}Test extends TestCase
+{
+    public function test_store()
+    {
+        $response = $this->json('post', '/api/{{ modelLower }}', [
+            // TODO custom fields
+        ]);
+
+        $response->assertStatus(Response::HTTP_ACCEPTED);
+    }
+
+    public function test_index()
+    {
+        $response = $this->json('get', '/api/{{ modelLower }}');
+
+        $response->assertStatus(Response::HTTP_OK);
+    }
+
+    public function test_show()
+    {
+        $response = $this->json('get', '/api/{{ modelLower }}/1');
+
+        $response->assertStatus(Response::HTTP_OK);
+    }
+
+    public function test_update()
+    {
+        $response = $this->json('put', '/api/{{ modelLower }}/1', [
+            // TODO custom fields
+        ]);
+
+        $response->assertStatus(Response::HTTP_ACCEPTED);
+    }
+
+//    public function test_delete()
+//    {
+//        $response = $this->json('delete', '/api/{{ modelLower }}/1');
+//
+//        $response->assertStatus(Response::HTTP_ACCEPTED);
+//    }
+}

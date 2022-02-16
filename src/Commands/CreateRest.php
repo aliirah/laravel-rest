@@ -5,6 +5,7 @@ namespace Alirah\LaravelRest\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class CreateRest extends Command
@@ -64,6 +65,8 @@ class CreateRest extends Command
 
         $this->createFactory();
         $this->createSeeder();
+
+        $this->createTest();
 
         $this->composer->dumpOptimized();
     }
@@ -189,7 +192,7 @@ class CreateRest extends Command
         $fullName = date('Y_m_d_His', time()) . "_create_{$this->tableName}_table";
         $this->namespace = '/migrations/';
 
-        if (!$this->force && DB::table($this->tableName)) {
+        if (!$this->force && Schema::hasTable($this->tableName)) {
             $this->warn("Table {$this->tableName} already exists.");
             if (!$this->confirm('Do you want to create migration anyway?')) return;
         }
@@ -251,6 +254,24 @@ class CreateRest extends Command
 
         $this->createFile($this->namespace, "{$this->model}Seeder.php", $seeder, database_path());
         $this->info("{$this->model}Seeder created");
+    }
+
+    /**
+     * @return void
+     */
+    public function createTest(): void
+    {
+        $this->namespace = "\\tests\\Feature\\" . $this->modelFull;
+        $test = $this->getTemplate('/stubs/test/Test.stub');
+
+        $existsPath = base_path() . "\\tests\\Feature\\{$this->modelFull}\\{$this->model}Test.php";
+        if (!$this->force && File::exists($existsPath)) {
+            $this->warn("{$this->modelFull}Test already exists.");
+            if (!$this->confirm('Do you want to override test?')) return;
+        }
+
+        $this->createFile($this->namespace, "{$this->model}Test.php", $test, base_path());
+        $this->info("{$this->model}Test created");
     }
 
     /**
