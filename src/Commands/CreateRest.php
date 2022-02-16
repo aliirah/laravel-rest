@@ -62,6 +62,8 @@ class CreateRest extends Command
         $this->createModel();
         $this->createMigration();
 
+        $this->createFactory();
+
         $this->composer->dumpOptimized();
     }
 
@@ -228,6 +230,16 @@ class CreateRest extends Command
      */
     public function createFactory(): void
     {
+        $this->namespace = "\\Database\\Factories";
+        $model = $this->getTemplate('/stubs/factory/Factory.stub');
 
+        $existsPath = database_path() . "\\factories\\{$this->model}Factory.php";
+        if (!$this->force && File::exists($existsPath)) {
+            $this->warn("{$this->model}Factory already exists.");
+            if (!$this->confirm('Do you want to override factory?')) return;
+        }
+
+        $this->createFile($this->namespace, "{$this->model}Factory.php", $model);
+        $this->info("{$this->model}Factory created");
     }
 }
