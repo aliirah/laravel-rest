@@ -3,7 +3,7 @@
 namespace Alirah\LaravelRest\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -27,10 +27,12 @@ class CreateRest extends Command
     public mixed $composer;
     public string $model;
     public string $modelLower;
+    public string $modelLowerPlural;
     public string $modelFull;
     public string $namespace;
     public string $tableName;
     public bool $force;
+    public array $config;
 
     public function __construct()
     {
@@ -48,9 +50,11 @@ class CreateRest extends Command
 
     public function handle()
     {
+        $this->config = config('laravel-rest');
         $this->modelFull = str_replace("/", "\\", $this->argument('model'));
         $this->model = array_reverse(explode("\\", $this->modelFull))[0];
         $this->modelLower = lcfirst($this->model);
+        $this->modelLowerPlural = Str::plural($this->modelLower);
         $this->tableName = '';
 
         $this->force = $this->option('force');
@@ -60,55 +64,21 @@ class CreateRest extends Command
         $this->createResource();
         $this->createController();
 
-        $this->createModel();
-        $this->createMigration();
+        if ($this->config['model'])
+            $this->createModel();
 
-        $this->createFactory();
-        $this->createSeeder();
+        if ($this->config['migration'])
+            $this->createMigration();
 
-        $this->createTest();
-
-        $this->composer->dumpOptimized();
-    }
-
-    /**
-     * @param $path
-     * @param $fileName
-     * @param $contents
-     * @param string $baseFolder
-     * @return void
-     */
-    public function createFile($path, $fileName, $contents, string $baseFolder = 'app')
-    {
-        $pathWithOutApp = str_replace('App', '', $path);
-
-        if ($baseFolder == 'app') $path = app_path() . $pathWithOutApp . DIRECTORY_SEPARATOR;
-        else $path = $baseFolder . $pathWithOutApp . DIRECTORY_SEPARATOR;
-
-        if (!file_exists($path)) {
-            mkdir($path, 0755, true);
+        if ($this->config['factory_seeder']) {
+            $this->createFactory();
+            $this->createSeeder();
         }
 
-        $fullPath = $path.$fileName;
+        if ($this->config['test'])
+            $this->createTest();
 
-        file_put_contents($fullPath, $contents);
-    }
-
-    /**
-     * @param $stub
-     * @param bool $hasNamespace
-     * @return array|bool|string
-     */
-    public function getTemplate($stub, bool $hasNamespace = true): array|bool|string
-    {
-        if ($hasNamespace) $namespace = $this->namespace;
-        else $namespace = null;
-
-        return str_replace(
-            ['{{ namespace }}', '{{ modelFull }}', '{{ model }}', '{{ modelLower }}', '{{ tableName }}'],
-            [$namespace, $this->modelFull, $this->model, $this->modelLower, $this->tableName],
-            file_get_contents(dirname(__DIR__ ,1) . $stub)
-        );
+        $this->composer->dumpOptimized();
     }
 
     /**
@@ -171,7 +141,10 @@ class CreateRest extends Command
     public function createController(): void
     {
         $this->namespace = "App\\Http\\Controllers\\" . $this->modelFull;
-        $controller = $this->getTemplate('/stubs/controller/Controller.stub');
+        if ($this->config['swagger'])
+            $controller = $this->getTemplate('/stubs/controller/swagger/Controller.stub');
+        else
+            $controller = $this->getTemplate('/stubs/controller/Controller.stub');
 
         $existsPath = app_path() . "\\Http\\Controllers\\{$this->modelFull}\\{$this->model}Controller.php";
         if (!$this->force && File::exists($existsPath)) {
@@ -272,6 +245,46 @@ class CreateRest extends Command
 
         $this->createFile($this->namespace, "{$this->model}Test.php", $test, base_path());
         $this->info("{$this->model}Test created");
+    }
+
+    /**
+     * @param $path
+     * @param $fileName
+     * @param $contents
+     * @param string $baseFolder
+     * @return void
+     */
+    public function createFile($path, $fileName, $contents, string $baseFolder = 'app')
+    {
+        $pathWithOutApp = str_replace('App', '', $path);
+
+        if ($baseFolder == 'app') $path = app_path() . $pathWithOutApp . DIRECTORY_SEPARATOR;
+        else $path = $baseFolder . $pathWithOutApp . DIRECTORY_SEPARATOR;
+
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
+
+        $fullPath = $path.$fileName;
+
+        file_put_contents($fullPath, $contents);
+    }
+
+    /**
+     * @param $stub
+     * @param bool $hasNamespace
+     * @return array|bool|string
+     */
+    public function getTemplate($stub, bool $hasNamespace = true): array|bool|string
+    {
+        if ($hasNamespace) $namespace = $this->namespace;
+        else $namespace = null;
+
+        return str_replace(
+            ['{{ namespace }}', '{{ modelFull }}', '{{ model }}', '{{ modelLower }}', '{{ tableName }}', '{{ modelLowerPlural }}'],
+            [$namespace, $this->modelFull, $this->model, $this->modelLower, $this->tableName, $this->modelLowerPlural],
+            file_get_contents(dirname(__DIR__ ,1) . $stub)
+        );
     }
 
     /**

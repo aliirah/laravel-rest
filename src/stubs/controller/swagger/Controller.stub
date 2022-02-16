@@ -1,0 +1,238 @@
+<?php
+
+namespace {{ namespace }};
+
+use Alirah\LaravelRest\Rest;
+use App\Http\Controllers\Controller;
+use App\Http\Request\{{ modelFull }}\StoreRequest;
+use App\Http\Request\{{ modelFull }}\UpdateRequest;
+use Illuminate\Http\JsonResponse;
+use App\Models\{{ model }};
+use App\Http\Resource\{{ modelFull }}\{{ model }}Resource;
+
+class {{ model }}Controller extends Controller
+{
+
+
+    /**
+     * @OA\Get(
+     *      path="/api/{{ modelLowerPlural }}",
+     *      operationId="get{{ model }}sList",
+     *      tags={"{{ model }}s"},
+     *      summary="Get list of {{ modelLowerPlural }}",
+     *      description="Returns list of {{ modelLowerPlural }}",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *     @OA\JsonContent
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *     @OA\JsonContent
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden",
+     *     @OA\JsonContent
+     *      )
+     *     )
+     */
+    public function index(): JsonResponse
+    {
+        ${{ modelLower }}s = {{ model }}::paginate(20);
+        // TODO handle query
+        return Rest::ok({{ model }}Resource::collection(${{ modelLower }}s));
+    }
+
+/**
+     * @OA\Post(
+     *      path="/api/{{ modelLowerPlural }}",
+     *      operationId="store{{ model }}",
+     *      tags={"{{ model }}s"},
+     *      summary="Store new {{ modelLower }}",
+     *      description="Returns {{ modelLower }} data",
+     *      @OA\RequestBody(
+     *          required=true,
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Successful operation",
+     *     @OA\JsonContent
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request",
+     *     @OA\JsonContent
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *     @OA\JsonContent
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden",
+     *     @OA\JsonContent
+     *      )
+     * )
+     */
+    public function store(StoreRequest $request): JsonResponse
+    {
+        $item = {{ model }}::create($request->validated());
+
+        return Rest::accepted(new {{ model }}Resource($item));
+    }
+
+/**
+     * @OA\Get(
+     *      path="/api/{{ modelLowerPlural }}/{id}",
+     *      operationId="get{{ model }}ById",
+     *      tags={"{{ model }}s"},
+     *      summary="Get {{ modelLower }} information",
+     *      description="Returns {{ modelLower }} data",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="{{ model }} id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *     @OA\JsonContent
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request",
+     *     @OA\JsonContent
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *     @OA\JsonContent
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden",
+     *     @OA\JsonContent
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="{{ model }} Not Found",
+     *     @OA\JsonContent
+     *      )
+     * )
+     */
+    public function show({{ model }} ${{ modelLower }}): JsonResponse
+    {
+        // you can load relationships by using
+        // ${{ modelLower }}->load('relation-1', 'relation-2');
+
+        return Rest::ok(new {{ model }}Resource(${{ modelLower }}));
+    }
+
+/**
+     * @OA\Put(
+     *      path="/api/{{ modelLowerPlural }}/{id}",
+     *      operationId="update{{ model }}",
+     *      tags={"{{ model }}s"},
+     *      summary="Update existing {{ modelLower }}",
+     *      description="Returns updated {{ modelLower }} data",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="{{ model }} id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *      ),
+     *      @OA\Response(
+     *          response=202,
+     *          description="Successful operation",
+     *     @OA\JsonContent
+     *       ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request",
+     *     @OA\JsonContent
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *     @OA\JsonContent
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden",
+     *     @OA\JsonContent
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="{{ model }} Not Found",
+     *     @OA\JsonContent
+     *      )
+     * )
+     */
+    public function update(UpdateRequest $request, {{ model }} ${{ modelLower }}): JsonResponse
+    {
+        // TODO handle updated fields
+        ${{ modelLower }}->update($request->only(''));
+
+        return Rest::accepted(new {{ model }}Resource(${{ modelLower }}));
+    }
+
+/**
+     * @OA\Delete(
+     *      path="/api/{{ modelLowerPlural }}/{id}",
+     *      operationId="delete{{ model }}",
+     *      tags={"{{ model }}s"},
+     *      summary="Delete existing {{ modelLower }}",
+     *      description="Deletes a record and returns no content",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="{{ model }} id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=204,
+     *          description="Successful operation",
+     *     @OA\JsonContent
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *     @OA\JsonContent
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden",
+     *     @OA\JsonContent
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="{{ model }} Not Found",
+     *     @OA\JsonContent
+     *      )
+     * )
+     */
+    public function destroy({{ model }} ${{ modelLower }}): JsonResponse
+    {
+        ${{ modelLower }}->delete();
+
+        return Rest::accepted([
+            'message' => '{{ modelLower }} deleted successfully'
+        ]);
+    }
+}

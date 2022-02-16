@@ -88,7 +88,7 @@ class DeleteRest extends Command
                 'path' => database_path() . "\\seeders" . DIRECTORY_SEPARATOR . "{$this->model}Seeder.php",
             ],
             [
-                'path' => base_path() . "\\tests\\{$this->modelFull}" . DIRECTORY_SEPARATOR . "{$this->model}Test.php",
+                'path' => base_path() . "\\tests\\Feature\\{$this->modelFull}" . DIRECTORY_SEPARATOR . "{$this->model}Test.php",
             ]
         ];
     }
@@ -108,7 +108,7 @@ class DeleteRest extends Command
                 } else if ($this->confirm("Do you want to delete $path")) {
                     File::delete($path);
                     $this->info("Removes $path");
-                };
+                }
             }
         }
     }
