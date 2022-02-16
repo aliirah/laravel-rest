@@ -1,0 +1,28 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\{{ model }};
+use Illuminate\Database\Seeder;
+
+class {{ model }}Seeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        // TODO handle factory
+        // TODO you should add it to DatabaseSeeder
+        // for example:
+        // public function run()
+        //    {
+        //        $this->call([
+        //            {{ model }}Seeder::class
+        //        ]);
+        //    }
+        {{ model }}::factory(10)->create();
+    }
+}

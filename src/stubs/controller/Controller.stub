@@ -20,7 +20,7 @@ class {{ model }}Controller extends Controller
      */
     public function index(): JsonResponse
     {
-        ${{ modelLower }}s = {{ model }}::get();
+        ${{ modelLower }}s = {{ model }}::paginate(20);
         // TODO handle query
         return Rest::ok({{ model }}Resource::collection(${{ modelLower }}s));
     }

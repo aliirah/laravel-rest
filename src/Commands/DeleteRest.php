@@ -84,6 +84,9 @@ class DeleteRest extends Command
             [
                 'path' => database_path() . "\\factories" . DIRECTORY_SEPARATOR . "{$this->model}Factory.php",
             ],
+            [
+                'path' => database_path() . "\\seeders" . DIRECTORY_SEPARATOR . "{$this->model}Seeder.php",
+            ],
         ];
     }
 

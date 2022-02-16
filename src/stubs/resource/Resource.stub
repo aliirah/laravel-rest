@@ -19,7 +19,9 @@ class {{ model }}Resource extends JsonResource
     {
         // TODO return {{ model }} fields
         return [
-            //
+            'id' => $this->id,
+            // your fields
+            'createdAt' => $this->created_at
         ];
     }
 }

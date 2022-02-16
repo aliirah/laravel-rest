@@ -43,16 +43,16 @@ class CreateRest extends Command
      *
      * @var string
      */
-    protected $signature = 'rest:make {model} {{--F|full}}';
+    protected $signature = 'rest:make {model} {{--F|force}}';
 
     public function handle()
     {
-        $this->modelFull = $this->argument('model');
+        $this->modelFull = str_replace("/", "\\", $this->argument('model'));
         $this->model = array_reverse(explode("\\", $this->modelFull))[0];
         $this->modelLower = lcfirst($this->model);
         $this->tableName = '';
 
-        $this->force = $this->option('full');
+        $this->force = $this->option('force');
 
         $this->createStoreRequests();
         $this->createUpdateRequests();
@@ -63,6 +63,7 @@ class CreateRest extends Command
         $this->createMigration();
 
         $this->createFactory();
+        $this->createSeeder();
 
         $this->composer->dumpOptimized();
     }
@@ -150,7 +151,8 @@ class CreateRest extends Command
         $this->namespace = "App\\Http\\Resource\\" . $this->modelFull;
         $resource = $this->getTemplate('/stubs/resource/Resource.stub');
 
-        $existsPath = app_path() . "\\Http\\Resource\\{$this->model}\\{$this->modelFull}Resource.php";
+        $existsPath = app_path() . "\\Http\\Resource\\{$this->modelFull}\\{$this->model}Resource.php";
+
         if (!$this->force && File::exists($existsPath)) {
             $this->warn("{$this->modelFull}Resource already exists.");
             if (!$this->confirm('Do you want to override resource?')) return;
@@ -168,7 +170,7 @@ class CreateRest extends Command
         $this->namespace = "App\\Http\\Controllers\\" . $this->modelFull;
         $controller = $this->getTemplate('/stubs/controller/Controller.stub');
 
-        $existsPath = app_path() . "\\Http\\Controllers\\{$this->model}\\{$this->modelFull}Controller.php";
+        $existsPath = app_path() . "\\Http\\Controllers\\{$this->modelFull}\\{$this->model}Controller.php";
         if (!$this->force && File::exists($existsPath)) {
             $this->warn("{$this->modelFull}Controller already exists.");
             if (!$this->confirm('Do you want to override controller?')) return;
@@ -215,23 +217,13 @@ class CreateRest extends Command
         $this->info("{$this->model} Model created");
     }
 
-    public function camelCase2UnderScore($str, $separator = "_"): string
-    {
-        if (empty($str)) {
-            return $str;
-        }
-        $str = lcfirst($str);
-        $str = preg_replace("/[A-Z]/", $separator . "$0", $str);
-        return strtolower($str);
-    }
-
     /**
      * @return void
      */
     public function createFactory(): void
     {
-        $this->namespace = "\\Database\\Factories";
-        $model = $this->getTemplate('/stubs/factory/Factory.stub');
+        $this->namespace = "\\factories";
+        $factory = $this->getTemplate('/stubs/factory/Factory.stub');
 
         $existsPath = database_path() . "\\factories\\{$this->model}Factory.php";
         if (!$this->force && File::exists($existsPath)) {
@@ -239,7 +231,39 @@ class CreateRest extends Command
             if (!$this->confirm('Do you want to override factory?')) return;
         }
 
-        $this->createFile($this->namespace, "{$this->model}Factory.php", $model);
+        $this->createFile($this->namespace, "{$this->model}Factory.php", $factory, database_path());
         $this->info("{$this->model}Factory created");
+    }
+
+    /**
+     * @return void
+     */
+    public function createSeeder(): void
+    {
+        $this->namespace = "\\seeders";
+        $seeder = $this->getTemplate('/stubs/seeder/Seeder.stub');
+
+        $existsPath = database_path() . "\\seeders\\{$this->model}Seeder.php";
+        if (!$this->force && File::exists($existsPath)) {
+            $this->warn("{$this->model}Seeder already exists.");
+            if (!$this->confirm('Do you want to override seeder?')) return;
+        }
+
+        $this->createFile($this->namespace, "{$this->model}Seeder.php", $seeder, database_path());
+        $this->info("{$this->model}Seeder created");
+    }
+
+    /**
+     * @param $str
+     * @param string $separator
+     * @return string
+     */
+    public function camelCase2UnderScore($str, string $separator = "_"): string
+    {
+        if (empty($str)) return $str;
+
+        $str = lcfirst($str);
+        $str = preg_replace("/[A-Z]/", $separator . "$0", $str);
+        return strtolower($str);
     }
 }
