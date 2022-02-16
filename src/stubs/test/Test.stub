@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\{{ model }};
 
+use App\Models\{{ model }};
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Symfony\Component\HttpFoundation\Response;
@@ -9,42 +10,73 @@ use Tests\TestCase;
 
 class {{ model }}Test extends TestCase
 {
-    public function test_store()
-    {
-        $response = $this->json('post', '/api/{{ modelLower }}', [
-            // TODO custom fields
-        ]);
+    use RefreshDatabase;
 
-        $response->assertStatus(Response::HTTP_ACCEPTED);
+    protected array $dataStruct;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->dataStruct = [
+            'id',
+            // TODO Enter Fields that return from {{ modelFull }}Resource
+            'createdAt'
+        ];
+
+        {{ model }}::factory(10)->create();
     }
 
     public function test_index()
     {
-        $response = $this->json('get', '/api/{{ modelLower }}s');
+        $response = $this->json('get', '/api/{{ modelLowerPlural }}');
 
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonStructure([
+                'data' => [
+                    $this->dataStruct
+                ]
+            ]);
+    }
+
+    public function test_store()
+    {
+        $response = $this->json('post', '/api/{{ modelLowerPlural }}', [
+            // Todo enter a test data to store
+            // for example 'title' => 'foo'
+        ]);
+
+        $response->assertStatus(Response::HTTP_ACCEPTED)
+            ->assertJsonStructure([
+                'data' => $this->dataStruct
+            ]);
     }
 
     public function test_show()
     {
-        $response = $this->json('get', '/api/{{ modelLower }}s/1');
+        $response = $this->json('get', '/api/{{ modelLowerPlural }}/1');
 
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonStructure([
+                'data' => $this->dataStruct
+            ]);
     }
 
     public function test_update()
     {
-        $response = $this->json('put', '/api/{{ modelLower }}s/1', [
-            // TODO custom fields
-        ]);
+        $response = $this->json('put', '/api/{{ modelLowerPlural }}/1', $this->dataStruct);
+
+        $response->assertStatus(Response::HTTP_ACCEPTED)
+            ->assertJsonStructure([
+                'data' => $this->dataStruct
+            ]);
+    }
+
+    public function test_delete()
+    {
+        $response = $this->json('delete', '/api/{{ modelLowerPlural }}/1');
 
         $response->assertStatus(Response::HTTP_ACCEPTED);
     }
-
-//    public function test_delete()
-//    {
-//        $response = $this->json('delete', '/api/{{ modelLower }}s/1');
-//
-//        $response->assertStatus(Response::HTTP_ACCEPTED);
-//    }
 }
+
