@@ -15,7 +15,7 @@ class LaravelRestServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
+        $this->mergeConfigFrom(__DIR__.'./config/config.php', 'laravel-rest');
     }
 
     /**
@@ -40,5 +40,10 @@ class LaravelRestServiceProvider extends ServiceProvider
         $this->commands([
             'rest:delete'
         ]);
+
+        // publish config file
+        $this->publishes([
+            __DIR__.'./config/config.php' => config_path('laravel-rest.php'),
+        ], 'config');
     }
 }
