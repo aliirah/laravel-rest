@@ -2,8 +2,8 @@
 
 namespace Alirah\LaravelRest\Commands;
 
+use Alirah\LaravelRest\Util;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -33,11 +33,13 @@ class CreateRest extends Command
     public string $tableName;
     public bool $force;
     public array $config;
+    public Util $util;
 
     public function __construct()
     {
         parent::__construct();
 
+        $this->util = new Util;
         $this->composer = app()['composer'];
     }
 
@@ -52,7 +54,7 @@ class CreateRest extends Command
     {
         $this->config = config('laravel-rest');
 
-        $this->modelFull = $this->transformInput();
+        $this->modelFull = $this->util->transformInput($this->argument('model'));
         $this->model = array_reverse(explode("\\", $this->modelFull))[0];
         $this->modelLower = lcfirst($this->model);
         $this->modelLowerPlural = Str::plural($this->modelLower);
@@ -165,7 +167,7 @@ class CreateRest extends Command
      */
     public function createMigration(): void
     {
-        $this->tableName = Str::plural($this->camelCase2UnderScore($this->model));
+        $this->tableName = Str::plural($this->util->camelCase2UnderScore($this->model));
         $fullName = date('Y_m_d_His', time()) . "_create_{$this->tableName}_table";
         $this->namespace = '/migrations/';
 
@@ -265,26 +267,13 @@ class CreateRest extends Command
             return;
         }
 
-        $apiFile = File::get($filePath);
-        if (!str_contains($apiFile, $route)) {
+        $match = $this->util->matchInFile($filePath, $route);
+
+        if (!$match && $match == 0) {
             File::append($filePath, $route);
             $this->info("{$this->model} route added");
         } else
             $this->info("route for {$this->model} already exists.");
-    }
-
-    /**
-     * @return string
-     */
-    public function transformInput(): string
-    {
-        $dashToBackSlash = str_replace("/", "\\", $this->argument('model'));
-        $modelEl = explode("\\", $dashToBackSlash);
-        $upperEl = [];
-        foreach ($modelEl as $element) {
-            $upperEl[] = Str::ucfirst(Str::camel($element));
-        }
-        return implode("\\", $upperEl);
     }
 
     /**
@@ -325,19 +314,5 @@ class CreateRest extends Command
             [$namespace, $this->modelFull, $this->model, $this->modelLower, $this->tableName, $this->modelLowerPlural],
             file_get_contents(dirname(__DIR__ ,1) . $stub)
         );
-    }
-
-    /**
-     * @param $str
-     * @param string $separator
-     * @return string
-     */
-    public function camelCase2UnderScore($str, string $separator = "_"): string
-    {
-        if (empty($str)) return $str;
-
-        $str = lcfirst($str);
-        $str = preg_replace("/[A-Z]/", $separator . "$0", $str);
-        return strtolower($str);
     }
 }
