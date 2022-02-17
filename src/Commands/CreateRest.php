@@ -309,9 +309,11 @@ class CreateRest extends Command
         if ($hasNamespace) $namespace = $this->namespace;
         else $namespace = null;
 
+        $routePrefix = $this->config['swagger_route_prefix'] ?? 'api';
+
         return str_replace(
-            ['{{ namespace }}', '{{ modelFull }}', '{{ model }}', '{{ modelLower }}', '{{ tableName }}', '{{ modelLowerPlural }}'],
-            [$namespace, $this->modelFull, $this->model, $this->modelLower, $this->tableName, $this->modelLowerPlural],
+            ['{{ namespace }}', '{{ modelFull }}', '{{ model }}', '{{ modelLower }}', '{{ tableName }}', '{{ modelLowerPlural }}', '{{ routePrefix }}'],
+            [$namespace, $this->modelFull, $this->model, $this->modelLower, $this->tableName, $this->modelLowerPlural, $routePrefix],
             file_get_contents(dirname(__DIR__ ,1) . $stub)
         );
     }

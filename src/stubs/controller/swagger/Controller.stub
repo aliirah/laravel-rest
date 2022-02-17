@@ -16,7 +16,7 @@ class {{ model }}Controller extends Controller
 
     /**
      * @OA\Get(
-     *      path="/api/{{ modelLowerPlural }}",
+     *      path="/{{ routePrefix }}/{{ modelLowerPlural }}",
      *      operationId="get{{ model }}sList",
      *      tags={"{{ model }}s"},
      *      summary="Get list of {{ modelLowerPlural }}",
@@ -47,7 +47,7 @@ class {{ model }}Controller extends Controller
 
 /**
      * @OA\Post(
-     *      path="/api/{{ modelLowerPlural }}",
+     *      path="/{{ routePrefix }}/{{ modelLowerPlural }}",
      *      operationId="store{{ model }}",
      *      tags={"{{ model }}s"},
      *      summary="Store new {{ modelLower }}",
@@ -86,7 +86,7 @@ class {{ model }}Controller extends Controller
 
 /**
      * @OA\Get(
-     *      path="/api/{{ modelLowerPlural }}/{id}",
+     *      path="/{{ routePrefix }}/{{ modelLowerPlural }}/{id}",
      *      operationId="get{{ model }}ById",
      *      tags={"{{ model }}s"},
      *      summary="Get {{ modelLower }} information",
@@ -137,7 +137,7 @@ class {{ model }}Controller extends Controller
 
 /**
      * @OA\Put(
-     *      path="/api/{{ modelLowerPlural }}/{id}",
+     *      path="/{{ routePrefix }}/{{ modelLowerPlural }}/{id}",
      *      operationId="update{{ model }}",
      *      tags={"{{ model }}s"},
      *      summary="Update existing {{ modelLower }}",
@@ -191,7 +191,7 @@ class {{ model }}Controller extends Controller
 
 /**
      * @OA\Delete(
-     *      path="/api/{{ modelLowerPlural }}/{id}",
+     *      path="/{{ routePrefix }}/{{ modelLowerPlural }}/{id}",
      *      operationId="delete{{ model }}",
      *      tags={"{{ model }}s"},
      *      summary="Delete existing {{ modelLower }}",
