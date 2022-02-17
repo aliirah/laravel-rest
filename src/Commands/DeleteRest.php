@@ -2,11 +2,10 @@
 
 namespace Alirah\LaravelRest\Commands;
 
+use Alirah\LaravelRest\Util;
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Support\Str;
 
 class DeleteRest extends Command
 {
@@ -27,14 +26,20 @@ class DeleteRest extends Command
     public mixed $composer;
     public string $model;
     public string $modelLower;
+    public string $modelLowerPlural;
     public string $modelFull;
-    public array $models;
-    public string|array|bool|null $force;
+    public string $namespace;
+    public string $tableName;
+    public bool $force;
+    public array $config;
+    public Util $util;
+
 
     public function __construct()
     {
         parent::__construct();
 
+        $this->util = new Util;
         $this->composer = app()['composer'];
     }
 
@@ -47,15 +52,19 @@ class DeleteRest extends Command
 
     public function handle()
     {
-        $this->modelFull = $this->argument('model');
+        $this->config = config('laravel-rest');
+
+        $this->modelFull = $this->util->transformInput($this->argument('model'));
         $this->model = array_reverse(explode("\\", $this->modelFull))[0];
         $this->modelLower = lcfirst($this->model);
+        $this->modelLowerPlural = Str::plural($this->modelLower);
+        $this->tableName = '';
 
         // get all options
         $this->force = $this->option('force');
 
-        $allFiles = $this->getAllFiles();
-        $this->deleteAllFiles($allFiles);
+        $this->deleteAllFiles();
+        $this->replaceStrings();
 
         $this->composer->dumpOptimized();
     }
@@ -63,7 +72,7 @@ class DeleteRest extends Command
     /**
      * @return string[]
      */
-    public function getAllFiles(): array
+    public function getAllFilesForDeletes(): array
     {
         return [
             [
@@ -94,12 +103,12 @@ class DeleteRest extends Command
     }
 
     /**
-     * @param array $allFiles
      * @return void
      */
-    public function deleteAllFiles(array $allFiles): void
+    public function deleteAllFiles(): void
     {
-        foreach ($allFiles as $file) {
+        $allDeleteFiles = $this->getAllFilesForDeletes();
+        foreach ($allDeleteFiles as $file) {
             $path = $file['path'];
             if (File::exists($path)) {
                 if ($this->force) {
@@ -108,6 +117,41 @@ class DeleteRest extends Command
                 } else if ($this->confirm("Do you want to delete $path")) {
                     File::delete($path);
                     $this->info("Removes $path");
+                }
+            }
+        }
+    }
+
+    public function getAllReplaceFiles(): array
+    {
+        $routePath = $this->config['route_path'] ?? 'api.php';
+        return [
+            [
+                'path' => base_path("\\routes\\$routePath"),
+                'old_string' => "Route::apiResource('{$this->modelLowerPlural}', \App\Http\Controllers\\$this->modelFull\\{$this->model}Controller::class);",
+                'new_string' => ""
+            ]
+        ];
+    }
+
+    public function replaceStrings()
+    {
+        $allReplaceFiles = $this->getAllReplaceFiles();
+
+        foreach ($allReplaceFiles as $file) {
+            $path = $file['path'];
+            $oldString = $file['old_string'];
+            $newString = $file['new_string'];
+
+            $match = $this->util->matchInFile($path, $oldString);
+
+            if ($match && $match > 0) {
+                if ($this->force) {
+                    file_put_contents($path, str_replace($oldString, $newString, file_get_contents($path)));
+                    $this->info("Removes $oldString");
+                } else if ($this->confirm("Do you want to delete $oldString")) {
+                    file_put_contents($path, str_replace($oldString, $newString, file_get_contents($path)));
+                    $this->info("Removes $oldString");
                 }
             }
         }
