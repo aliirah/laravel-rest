@@ -8,6 +8,11 @@ return [
     'migration' => true,
     'factory_seeder' => true,
     'test' => true,
+
+    'route' => true,
+    // file in the routes' folder
+    // if you have another folder in routes use this pattern: v1/api.php
+    'route_path' => 'api.php'
 ];
 
 

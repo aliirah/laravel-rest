@@ -51,7 +51,8 @@ class CreateRest extends Command
     public function handle()
     {
         $this->config = config('laravel-rest');
-        $this->modelFull = str_replace("/", "\\", $this->argument('model'));
+
+        $this->modelFull = $this->transformInput();
         $this->model = array_reverse(explode("\\", $this->modelFull))[0];
         $this->modelLower = lcfirst($this->model);
         $this->modelLowerPlural = Str::plural($this->modelLower);
@@ -77,6 +78,9 @@ class CreateRest extends Command
 
         if ($this->config['test'])
             $this->createTest();
+
+        if ($this->config['route'])
+            $this->createRoute();
 
         $this->composer->dumpOptimized();
     }
@@ -245,6 +249,42 @@ class CreateRest extends Command
 
         $this->createFile($this->namespace, "{$this->model}Test.php", $test, base_path());
         $this->info("{$this->model}Test created");
+    }
+
+    /**
+     * @return void
+     */
+    public function createRoute(): void
+    {
+        $routeFile = $this->config['route_path'] ?? 'api.php';
+        $route = "\nRoute::apiResource('{$this->modelLowerPlural}', \App\Http\Controllers\\$this->modelFull\\{$this->model}Controller::class);";
+        $filePath = base_path("routes/$routeFile");
+
+        if (!File::exists($filePath)) {
+            $this->error("$filePath does not exists");
+            return;
+        }
+
+        $apiFile = File::get($filePath);
+        if (!str_contains($apiFile, $route)) {
+            File::append($filePath, $route);
+            $this->info("{$this->model} route added");
+        } else
+            $this->info("route for {$this->model} already exists.");
+    }
+
+    /**
+     * @return string
+     */
+    public function transformInput(): string
+    {
+        $dashToBackSlash = str_replace("/", "\\", $this->argument('model'));
+        $modelEl = explode("\\", $dashToBackSlash);
+        $upperEl = [];
+        foreach ($modelEl as $element) {
+            $upperEl[] = Str::ucfirst(Str::camel($element));
+        }
+        return implode("\\", $upperEl);
     }
 
     /**
