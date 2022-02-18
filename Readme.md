@@ -1,7 +1,4 @@
-#Laravel Rest
-
-
-[![Software License][ico-license]](LICENSE.md)
+# Laravel Rest
 
 This is a Laravel Package to build RESTFUL API much easier. This package supports `Laravel 5.8+`.
 
