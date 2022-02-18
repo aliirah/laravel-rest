@@ -1,6 +1,6 @@
 <?php
 
-namespace Alirah\LaravelRest;
+namespace Alirah\LaravelRest\Facade;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Symfony\Component\HttpFoundation\Response;

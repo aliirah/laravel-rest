@@ -1,6 +1,6 @@
 <?php
 
-namespace Alirah\LaravelRest;
+namespace Alirah\LaravelRest\Facade;
 
 use Illuminate\Support\Facades\Facade;
 
@@ -24,6 +24,6 @@ class Rest extends Facade
      */
     protected static function getFacadeAccessor(): string
     {
-        return 'Alirah\LaravelRest\LaravelRest';
+        return 'Alirah\LaravelRest\Facade\LaravelRest';
     }
 }
