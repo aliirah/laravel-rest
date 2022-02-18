@@ -3,7 +3,7 @@
 This is a Laravel Package to build RESTFUL API much easier. This package supports `Laravel 5.8+`.
 
 
-> With this package you can build all the things needed for RESTFUL API with only one command. Such as Controller, Resource, Request, Model, Migration, Route, Test and swagger. Moreover, you can delete it as well.
+> With this package you can build all the things needed for RESTFUL API with only one command. Such as Controller, Resource, Request, Model, Migration, Seeder, Factory, Route, Test and swagger. Moreover, you can delete it as well.
 
 
 _____________________________
