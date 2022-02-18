@@ -8,6 +8,9 @@
             "Alirah\\LaravelRest\\": "src/"
         }
     },
+    "require": {
+        "illuminate/support": ">=5.8"
+    },
     "extra": {
         "laravel": {
             "providers": [
