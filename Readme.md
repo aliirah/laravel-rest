@@ -36,7 +36,7 @@ _____________________________
 Via Composer
 
 ``` bash
-$ composer require aliirah/laravel-rest
+$ composer require alirah/laravel-rest
 ```
 
 ## Configure
