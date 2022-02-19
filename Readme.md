@@ -10,12 +10,12 @@ _____________________________
 
 # List of contents
 
-- [Laravel Rest](/#Laravel-Rest)
-- [List of contents](/#list-of-contents)
-- [Install](/#Install)
-- [Configure](/#Configure)
-- [Swagger](/#Swagger)
-- [Testing](/#Testing)
+- [Laravel Rest](#Laravel-Rest)
+- [List of contents](#list-of-contents)
+- [Install](#Install)
+- [Configure](#Configure)
+- [Swagger](#Swagger)
+- [Testing](#Testing)
 - [How to use](#How-to-use)
     - [Create](#Create)
     - [Delete](#Delete)
@@ -217,7 +217,7 @@ This Command create these files:
 * database\factories\ModelNameFactory.php
 * database\seeders\ModelNameSeeder.php
 * tests\Feature\ModelName\ModelNameTest.php
-* and remove the line below line in ./routes/api.php
+* and add the line below in the end of ./routes/api.php
 
 ```php
 ...
@@ -242,14 +242,14 @@ This Command delete these files:
 * database\factories\ModelNameFactory.php
 * database\seeders\ModelNameSeeder.php
 * tests\Feature\ModelName\ModelNameTest.php
-* and add the line below line to ./routes/api.php
+* and remove the line below at the end of ./routes/api.php
 
 ```php
 ...
 Route::apiResource('modelNames', \App\Http\Controllers\ModelName\ModelNameController::class);
 ```
 - You can change the api.php file in config.
-- For deleting every file, it needs your permission in cmd.
+  For deleting every file, it needs your permission in cmd.
 - You can use -F or --force flag to force it.
 
 ### Versioning
@@ -322,7 +322,7 @@ Available methods for Rest facade:
 The $data should be Laravel resource or an array
 
 ### Example
-When run ```php artisan rest:make Blog``` and enable swagger, this is the result:
+When enable swagger and run ```php artisan rest:make Blog``` this is the result:
 
 app\Models\Blog.php
 ```php
@@ -403,7 +403,7 @@ class BlogController extends Controller
      *          required=true,
      *      ),
      *      @OA\Response(
-     *          response=201,
+     *          response=202,
      *          description="Successful operation",
      *     @OA\JsonContent
      *       ),
@@ -553,7 +553,7 @@ class BlogController extends Controller
      *          )
      *      ),
      *      @OA\Response(
-     *          response=204,
+     *          response=202,
      *          description="Successful operation",
      *     @OA\JsonContent
      *       ),
@@ -809,6 +809,8 @@ class BlogTest extends TestCase
     use RefreshDatabase;
 
     protected array $dataStruct;
+    protected array $testData;
+    protected Blog $blog;
 
     public function setUp(): void
     {
@@ -816,11 +818,18 @@ class BlogTest extends TestCase
 
         $this->dataStruct = [
             'id',
-            // TODO Enter Fields that return from BlogResource
+            // TODO Enter fields that return from BlogResource
+            // e.g title
             'createdAt'
         ];
 
+        $this->testData = [
+            // TODO Enter test data for store and update methods
+            // e.g 'title' => 'title'
+        ];
+
         Blog::factory(10)->create();
+        $this->blog = Blog::inRandomOrder()->first();
     }
 
     public function test_index()
@@ -837,20 +846,19 @@ class BlogTest extends TestCase
 
     public function test_store()
     {
-        $response = $this->json('post', '/api/blogs', [
-            // Todo enter a test data to store
-            // for example 'title' => 'foo'
-        ]);
+        $response = $this->json('post', '/api/blogs', $this->testData);
 
         $response->assertStatus(Response::HTTP_ACCEPTED)
             ->assertJsonStructure([
                 'data' => $this->dataStruct
+            ])->assertJson([
+                'data' => $this->testData
             ]);
     }
 
     public function test_show()
     {
-        $response = $this->json('get', '/api/blogs/1');
+        $response = $this->json('get', "/api/blogs/{$this->blog->id}");
 
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonStructure([
@@ -860,21 +868,24 @@ class BlogTest extends TestCase
 
     public function test_update()
     {
-        $response = $this->json('put', '/api/blogs/1', $this->dataStruct);
+        $response = $this->json('put', "/api/blogs/{$this->blog->id}", $this->testData);
 
         $response->assertStatus(Response::HTTP_ACCEPTED)
             ->assertJsonStructure([
                 'data' => $this->dataStruct
+            ])->assertJson([
+                'data' => $this->testData
             ]);
     }
 
     public function test_delete()
     {
-        $response = $this->json('delete', '/api/blogs/1');
+        $response = $this->json('delete', "/api/blogs/{$this->blog->id}");
 
         $response->assertStatus(Response::HTTP_ACCEPTED);
     }
 }
+
 ```
 routes/api.php
 ```php
@@ -909,5 +920,5 @@ If you discover any security related issues, please email alirahgoshy@gmail.com 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
 [link-en]: README.md
-[link-packagist]: #
+[link-packagist]: https://packagist.org/packages/alirah/laravel-rest
 [link-author]: https://github.com/aliirah
