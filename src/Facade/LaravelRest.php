@@ -32,7 +32,7 @@ class LaravelRest
     }
 
     // for post,put,patch,delete request
-    // response 201
+    // response 202
     public function accepted($data): object
     {
         return $this->response($data , Response::HTTP_ACCEPTED);

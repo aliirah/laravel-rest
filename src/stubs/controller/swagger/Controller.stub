@@ -17,8 +17,8 @@ class {{ model }}Controller extends Controller
     /**
      * @OA\Get(
      *      path="/{{ routePrefix }}/{{ modelLowerPlural }}",
-     *      operationId="get{{ model }}sList",
-     *      tags={"{{ model }}s"},
+     *      operationId="get{{ modelPlural }}List",
+     *      tags={"{{ modelPlural }}"},
      *      summary="Get list of {{ modelLowerPlural }}",
      *      description="Returns list of {{ modelLowerPlural }}",
      *      @OA\Response(
@@ -40,23 +40,23 @@ class {{ model }}Controller extends Controller
      */
     public function index(): JsonResponse
     {
-        ${{ modelLower }}s = {{ model }}::paginate(20);
+        ${{ modelLowerPlural }} = {{ model }}::paginate(20);
         // TODO handle query
-        return Rest::ok({{ model }}Resource::collection(${{ modelLower }}s));
+        return Rest::ok({{ model }}Resource::collection(${{ modelLowerPlural }}));
     }
 
 /**
      * @OA\Post(
      *      path="/{{ routePrefix }}/{{ modelLowerPlural }}",
      *      operationId="store{{ model }}",
-     *      tags={"{{ model }}s"},
+     *      tags={"{{ modelPlural }}"},
      *      summary="Store new {{ modelLower }}",
      *      description="Returns {{ modelLower }} data",
      *      @OA\RequestBody(
      *          required=true,
      *      ),
      *      @OA\Response(
-     *          response=201,
+     *          response=202,
      *          description="Successful operation",
      *     @OA\JsonContent
      *       ),
@@ -88,7 +88,7 @@ class {{ model }}Controller extends Controller
      * @OA\Get(
      *      path="/{{ routePrefix }}/{{ modelLowerPlural }}/{id}",
      *      operationId="get{{ model }}ById",
-     *      tags={"{{ model }}s"},
+     *      tags={"{{ modelPlural }}"},
      *      summary="Get {{ modelLower }} information",
      *      description="Returns {{ modelLower }} data",
      *      @OA\Parameter(
@@ -139,7 +139,7 @@ class {{ model }}Controller extends Controller
      * @OA\Put(
      *      path="/{{ routePrefix }}/{{ modelLowerPlural }}/{id}",
      *      operationId="update{{ model }}",
-     *      tags={"{{ model }}s"},
+     *      tags={"{{ modelPlural }}"},
      *      summary="Update existing {{ modelLower }}",
      *      description="Returns updated {{ modelLower }} data",
      *      @OA\Parameter(
@@ -193,7 +193,7 @@ class {{ model }}Controller extends Controller
      * @OA\Delete(
      *      path="/{{ routePrefix }}/{{ modelLowerPlural }}/{id}",
      *      operationId="delete{{ model }}",
-     *      tags={"{{ model }}s"},
+     *      tags={"{{ modelPlural }}"},
      *      summary="Delete existing {{ modelLower }}",
      *      description="Deletes a record and returns no content",
      *      @OA\Parameter(
@@ -206,7 +206,7 @@ class {{ model }}Controller extends Controller
      *          )
      *      ),
      *      @OA\Response(
-     *          response=204,
+     *          response=202,
      *          description="Successful operation",
      *     @OA\JsonContent
      *       ),
