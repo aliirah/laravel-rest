@@ -13,6 +13,8 @@ class {{ model }}Test extends TestCase
     use RefreshDatabase;
 
     protected array $dataStruct;
+    protected array $testData;
+    protected {{ model }} ${{ modelLower }};
 
     public function setUp(): void
     {
@@ -20,11 +22,18 @@ class {{ model }}Test extends TestCase
 
         $this->dataStruct = [
             'id',
-            // TODO Enter Fields that return from {{ modelFull }}Resource
+            // TODO Enter fields that return from {{ model }}Resource
+            // e.g title
             'createdAt'
         ];
 
+        $this->testData = [
+            // TODO Enter test data for store and update methods
+            // e.g 'title' => 'title'
+        ];
+
         {{ model }}::factory(10)->create();
+        $this->{{ modelLower }} = {{ model }}::inRandomOrder()->first();
     }
 
     public function test_index()
@@ -41,20 +50,19 @@ class {{ model }}Test extends TestCase
 
     public function test_store()
     {
-        $response = $this->json('post', '/api/{{ modelLowerPlural }}', [
-            // Todo enter a test data to store
-            // for example 'title' => 'foo'
-        ]);
+        $response = $this->json('post', '/api/{{ modelLowerPlural }}', $this->testData);
 
         $response->assertStatus(Response::HTTP_ACCEPTED)
             ->assertJsonStructure([
                 'data' => $this->dataStruct
+            ])->assertJson([
+                'data' => $this->testData
             ]);
     }
 
     public function test_show()
     {
-        $response = $this->json('get', '/api/{{ modelLowerPlural }}/1');
+        $response = $this->json('get', "/api/{{ modelLowerPlural }}/{$this->{{ modelLower }}->id}");
 
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonStructure([
@@ -64,19 +72,20 @@ class {{ model }}Test extends TestCase
 
     public function test_update()
     {
-        $response = $this->json('put', '/api/{{ modelLowerPlural }}/1', $this->dataStruct);
+        $response = $this->json('put', "/api/{{ modelLowerPlural }}/{$this->{{ modelLower }}->id}", $this->testData);
 
         $response->assertStatus(Response::HTTP_ACCEPTED)
             ->assertJsonStructure([
                 'data' => $this->dataStruct
+            ])->assertJson([
+                'data' => $this->testData
             ]);
     }
 
     public function test_delete()
     {
-        $response = $this->json('delete', '/api/{{ modelLowerPlural }}/1');
+        $response = $this->json('delete', "/api/{{ modelLowerPlural }}/{$this->{{ modelLower }}->id}");
 
         $response->assertStatus(Response::HTTP_ACCEPTED);
     }
 }
-
