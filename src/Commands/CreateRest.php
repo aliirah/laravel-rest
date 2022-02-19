@@ -26,6 +26,7 @@ class CreateRest extends Command
 
     public mixed $composer;
     public string $model;
+    public string $modelPlural;
     public string $modelLower;
     public string $modelLowerPlural;
     public string $modelFull;
@@ -56,6 +57,7 @@ class CreateRest extends Command
 
         $this->modelFull = $this->util->transformInput($this->argument('model'));
         $this->model = array_reverse(explode("\\", $this->modelFull))[0];
+        $this->modelPlural = Str::plural($this->model);
         $this->modelLower = lcfirst($this->model);
         $this->modelLowerPlural = Str::plural($this->modelLower);
         $this->tableName = '';
@@ -312,8 +314,8 @@ class CreateRest extends Command
         $routePrefix = $this->config['swagger_route_prefix'] ?? 'api';
 
         return str_replace(
-            ['{{ namespace }}', '{{ modelFull }}', '{{ model }}', '{{ modelLower }}', '{{ tableName }}', '{{ modelLowerPlural }}', '{{ routePrefix }}'],
-            [$namespace, $this->modelFull, $this->model, $this->modelLower, $this->tableName, $this->modelLowerPlural, $routePrefix],
+            ['{{ namespace }}', '{{ modelFull }}', '{{ model }}', '{{ modelLower }}', '{{ tableName }}', '{{ modelLowerPlural }}', '{{ modelPlural }}', '{{ routePrefix }}'],
+            [$namespace, $this->modelFull, $this->model, $this->modelLower, $this->tableName, $this->modelLowerPlural, $this->modelPlural, $routePrefix],
             file_get_contents(dirname(__DIR__ ,1) . $stub)
         );
     }
