@@ -9,6 +9,7 @@
         }
     },
     "require": {
+        "php": ">=7.3",
         "illuminate/support": ">=5.8"
     },
     "extra": {

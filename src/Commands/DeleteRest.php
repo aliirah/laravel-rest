@@ -23,16 +23,16 @@ class DeleteRest extends Command
      */
     protected $description = 'Delete LaravelRest';
 
-    public mixed $composer;
-    public string $model;
-    public string $modelLower;
-    public string $modelLowerPlural;
-    public string $modelFull;
-    public string $namespace;
-    public string $tableName;
-    public bool $force;
-    public array $config;
-    public Util $util;
+    public $composer;
+    public $model;
+    public $modelLower;
+    public $modelLowerPlural;
+    public $modelFull;
+    public $namespace;
+    public $tableName;
+    public $force;
+    public $config;
+    public $util;
 
 
     public function __construct()

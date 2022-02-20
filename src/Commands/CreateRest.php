@@ -24,17 +24,17 @@ class CreateRest extends Command
      */
     protected $description = 'Create New LaravelRest';
 
-    public mixed $composer;
-    public string $model;
-    public string $modelPlural;
-    public string $modelLower;
-    public string $modelLowerPlural;
-    public string $modelFull;
-    public string $namespace;
-    public string $tableName;
-    public bool $force;
-    public array $config;
-    public Util $util;
+    public $composer;
+    public $model;
+    public $modelPlural;
+    public $modelLower;
+    public $modelLowerPlural;
+    public $modelFull;
+    public $namespace;
+    public $tableName;
+    public $force;
+    public $config;
+    public $util;
 
     public function __construct()
     {
@@ -306,7 +306,7 @@ class CreateRest extends Command
      * @param bool $hasNamespace
      * @return array|bool|string
      */
-    public function getTemplate($stub, bool $hasNamespace = true): array|bool|string
+    public function getTemplate($stub, bool $hasNamespace = true)
     {
         if ($hasNamespace) $namespace = $this->namespace;
         else $namespace = null;

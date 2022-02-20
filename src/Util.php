@@ -31,7 +31,7 @@ class Util
         return strtolower($str);
     }
 
-    public function matchInFile(string $path, string $string): bool|int|null
+    public function matchInFile(string $path, string $string)
     {
         // get the file contents, assuming the file to be readable (and exist)
         $contents = file_get_contents($path);
