@@ -110,6 +110,12 @@ c. Copy the code in below then paste it to the top of the Controller class in  A
  *      title="Laravel Rest Swagger",
  *      version="1.0.0",
  * )
+ *
+ * @OA\Get(
+ *     path="/",
+ *     description="Home page",
+ *     @OA\Response(response="200", description="Home Page")
+ * )
  */
 ```
 
@@ -129,6 +135,12 @@ use Illuminate\Routing\Controller as BaseController;
  * @OA\Info (
  *      title="Laravel Rest Swagger",
  *      version="1.0.0",
+ * )
+ *
+ * @OA\Get(
+ *     path="/",
+ *     description="Home page",
+ *     @OA\Response(response="200", description="Home Page")
  * )
  */
 
@@ -323,6 +335,8 @@ The $data should be Laravel resource or an array
 
 ### Example
 When enable swagger and run ```php artisan rest:make Blog``` this is the result:
+
+* After fill all the required(TODO) fields you can run ```php artisan test``` for testing and ```php artisan l5-swagger:generate``` for generating swagger
 
 app\Models\Blog.php
 ```php
