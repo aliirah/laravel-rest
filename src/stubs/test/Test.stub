@@ -12,9 +12,9 @@ class {{ model }}Test extends TestCase
 {
     use RefreshDatabase;
 
-    protected array $dataStruct;
-    protected array $testData;
-    protected {{ model }} ${{ modelLower }};
+    protected $dataStruct;
+    protected $testData;
+    protected ${{ modelLower }};
 
     public function setUp(): void
     {

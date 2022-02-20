@@ -2,10 +2,8 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use JsonSerializable;
 
 class {{ model }}Resource extends JsonResource
 {
@@ -13,9 +11,9 @@ class {{ model }}Resource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  Request  $request
-     * @return array|Arrayable|JsonSerializable
+     * @return array
      */
-    public function toArray($request): array|JsonSerializable|Arrayable
+    public function toArray($request): array
     {
         // TODO return {{ model }} fields
         return [
