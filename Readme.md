@@ -359,7 +359,7 @@ class Blog extends Model
 }
 ```
 
-app\Http\Controllers\Blog\BlogController
+app\Http\Controllers\Blog\BlogController.php
 ```php
 <?php
 
@@ -601,7 +601,7 @@ class BlogController extends Controller
 }
 ```
 
-app\Http\Request\Blog\StoreRequest
+app\Http\Request\Blog\StoreRequest.php
 ```php
 <?php
 
