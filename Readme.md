@@ -164,6 +164,7 @@ e. To generate your swagger run:
 $ php artisan l5-swagger:generate
 ```
 
+By default, the swagger route is 'api/documentation' but you can change it in config/l5-swagger.php.
 To see the full documentation you can check https://github.com/DarkaOnLine/L5-Swagger.
 
 _____________________________
@@ -337,6 +338,7 @@ The $data should be Laravel resource or an array
 When enable swagger and run ```php artisan rest:make Blog``` this is the result:
 
 * After fill all the required(TODO) fields you can run ```php artisan test``` for testing and ```php artisan l5-swagger:generate``` for generating swagger
+* If you have not changed the default route in config/l5-swagger.php, you can visit the Swagger output in 'api/documentation'
 
 app\Models\Blog.php
 ```php
